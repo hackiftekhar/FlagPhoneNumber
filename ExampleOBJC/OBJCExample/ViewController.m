@@ -23,8 +23,11 @@
 		//		NSBundle.FlagIcons = [NSBundle bundleForClass: [self class]];
 	_phoneNumberTextField = [[FPNTextField alloc] initWithFrame: CGRectMake(0, 0, self.view.bounds.size.width - 16, 50)];
 	_phoneNumberTextField.borderStyle = UITextBorderStyleRoundedRect;
-	_phoneNumberTextField.displayMode = 0;
+    _phoneNumberTextField.parentViewController = self;
 	_phoneNumberTextField.delegate = self;
+//    _phoneNumberTextField.pickerFont = [UIFont italicSystemFontOfSize:15];
+//    _phoneNumberTextField.pickerTextColor = UIColor.redColor;
+
 		//	_phoneNumberTextField.flagSize = CGSizeMake(35, 35);
 		//	_phoneNumberTextField.flagButtonEdgeInsets = UIEdgeInsetsMake(10, 10, 10, 10);
 	_phoneNumberTextField.hasPhoneNumberExample = TRUE;

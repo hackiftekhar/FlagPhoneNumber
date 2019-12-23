@@ -8,21 +8,51 @@
 
 import UIKit
 
+open class CountryCell : UITableViewCell {
+
+    fileprivate let flagImageView = UIImageView(frame: CGRect(x: 15, y: 12, width: 20, height: 20))
+    fileprivate let countryCodeLabel = UILabel(frame: CGRect(x: 55, y: 11, width: 40, height: 22))
+    fileprivate let countryNameLabel = UILabel(frame: CGRect(x: 115, y: 13, width: 200, height: 18))
+
+    public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
+        flagImageView.contentMode = .scaleToFill
+        flagImageView.layer.cornerRadius = 10
+        flagImageView.layer.masksToBounds = true
+
+        countryNameLabel.autoresizingMask = [.flexibleWidth]
+        countryNameLabel.lineBreakMode = .byTruncatingMiddle
+        
+        self.contentView.addSubview(flagImageView)
+        self.contentView.addSubview(countryCodeLabel)
+        self.contentView.addSubview(countryNameLabel)
+    }
+    
+    required public init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+}
+
 open class FPNCountryListViewController: UITableViewController, UISearchResultsUpdating, UISearchControllerDelegate {
 
 	open var repository: FPNCountryRepository?
-	open var showCountryPhoneCode: Bool = true
 	open var searchController: UISearchController = UISearchController(searchResultsController: nil)
 	open var didSelect: ((FPNCountry) -> Void)?
 
 	var results: [FPNCountry]?
 
+    open var pickerFont: UIFont?
+    open var pickerTextColor: UIColor?
+
 	override open func viewDidLoad() {
 		super.viewDidLoad()
 
 		tableView.tableFooterView = UIView()
-
+        tableView.separatorStyle = .none
 		initSearchBarController()
+        
+        tableView.register(CountryCell.self, forCellReuseIdentifier: "CountryCell")
 	}
 
 	open func setup(repository: FPNCountryRepository) {
@@ -53,6 +83,16 @@ open class FPNCountryListViewController: UITableViewController, UISearchResultsU
 		definesPresentationContext = true
 	}
 
+    override open func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        searchController.isActive = true
+    }
+
+    @objc private func dismissController() {
+        dismiss(animated: true, completion: nil)
+    }
+
 	private func getItem(at indexPath: IndexPath) -> FPNCountry {
 		if searchController.isActive && results != nil && results!.count > 0 {
 			return results![indexPath.row]
@@ -75,15 +115,19 @@ open class FPNCountryListViewController: UITableViewController, UISearchResultsU
 	}
 
 	override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		let cell = UITableViewCell(style: .value1, reuseIdentifier: nil)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CountryCell", for: indexPath) as! CountryCell
+        
+        cell.countryCodeLabel.font = pickerFont ?? UIFont.systemFont(ofSize: 14)
+        cell.countryNameLabel.font = pickerFont ?? UIFont.systemFont(ofSize: 14)
+
+        cell.countryCodeLabel.textColor = pickerTextColor ?? UIColor.black
+        cell.countryNameLabel.textColor = pickerTextColor ?? UIColor.black
+
 		let country = getItem(at: indexPath)
 
-		cell.imageView?.image = country.flag
-		cell.textLabel?.text = country.name
-
-		if showCountryPhoneCode {
-			cell.detailTextLabel?.text = country.phoneCode
-		}
+        cell.flagImageView.image = country.flag
+        cell.countryCodeLabel.text = country.phoneCode
+        cell.countryNameLabel.text = country.name
 
 		return cell
 	}
@@ -134,4 +178,8 @@ open class FPNCountryListViewController: UITableViewController, UISearchResultsU
 	open func willDismissSearchController(_ searchController: UISearchController) {
 		results?.removeAll()
 	}
+
+    open func didDismissSearchController(_ searchController: UISearchController) {
+        dismissController()
+    }
 }

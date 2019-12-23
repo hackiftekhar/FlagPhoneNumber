@@ -6,6 +6,9 @@ open class FPNCountryPicker: UIPickerView, UIPickerViewDelegate, UIPickerViewDat
 	open var showPhoneNumbers: Bool
 	open var didSelect: ((FPNCountry) -> Void)?
 
+    open var pickerFont: UIFont?
+    open var pickerTextColor: UIColor?
+
 	public init(showPhoneNumbers: Bool = true) {
 		self.showPhoneNumbers = showPhoneNumbers
 
@@ -57,6 +60,12 @@ open class FPNCountryPicker: UIPickerView, UIPickerViewDelegate, UIPickerViewDat
 		} else {
 			resultView = view as! FPNCountryView
 		}
+
+        resultView.countryCodeLabel.font = pickerFont ?? UIFont.systemFont(ofSize: 14)
+        resultView.countryNameLabel.font = pickerFont ?? UIFont.systemFont(ofSize: 14)
+
+        resultView.countryCodeLabel.textColor = pickerTextColor ?? UIColor.black
+        resultView.countryNameLabel.textColor = pickerTextColor ?? UIColor.black
 
 		resultView.setup(country)
 
