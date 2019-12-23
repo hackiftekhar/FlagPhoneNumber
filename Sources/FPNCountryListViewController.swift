@@ -87,6 +87,7 @@ open class FPNCountryListViewController: UITableViewController, UISearchResultsU
         super.viewDidAppear(animated)
 
         searchController.isActive = true
+        searchController.searchBar.becomeFirstResponder()
     }
 
     @objc private func dismissController() {

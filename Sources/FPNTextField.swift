@@ -442,6 +442,7 @@ open class FPNTextField: UITextField {
         searchCountryViewController.setup(repository: countryRepository)
         searchCountryViewController.didSelect = { [weak self] country in
             self?.setFlag(countryCode: country.code)
+            self?.pickerView.setCountry(country.code)
         }
         
         parentViewController?.present(navigationViewController, animated: true, completion: nil)
