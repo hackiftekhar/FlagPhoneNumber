@@ -11,18 +11,20 @@ import UIKit
 open class FPNTextField: UITextField {
 
 	/// The size of the flag button
-	@objc open var flagButtonSize: CGSize = CGSize(width: 32, height: 32) {
-		didSet {
-			layoutIfNeeded()
-		}
-	}
+    @objc open var flagButtonSize: CGSize = CGSize(width: 40, height: 40) {
+        didSet {
+            layoutIfNeeded()
+        }
+    }
 
-	private var flagWidthConstraint: NSLayoutConstraint?
-	private var flagHeightConstraint: NSLayoutConstraint?
+    private var flagWidthConstraint: NSLayoutConstraint?
+    private var flagHeightConstraint: NSLayoutConstraint?
+
+    private let leftContainerView = UIView()
 
 	/// The size of the leftView
 	private var leftViewSize: CGSize {
-		let width = flagButtonSize.width + getWidth(text: phoneCodeTextField.text!)
+        let width = flagButtonSize.width + getWidth(text: phoneCodeTextField.text!)
 		let height = bounds.height
 
 		return CGSize(width: width, height: height)
@@ -34,7 +36,7 @@ open class FPNTextField: UITextField {
 	private var nbPhoneNumber: NBPhoneNumber?
 	private var formatter: NBAsYouTypeFormatter?
 
-	open var flagButton: UIButton = UIButton()
+	open var flagButton: FPNButton = FPNButton()
 
 	open override var font: UIFont? {
 		didSet {
@@ -109,8 +111,6 @@ open class FPNTextField: UITextField {
 	}
 
 	private func setup() {
-		leftViewMode = .always
-
 		setupFlagButton()
 		setupPhoneCodeTextField()
 		setupLeftView()
@@ -128,11 +128,9 @@ open class FPNTextField: UITextField {
 	}
 
 	private func setupFlagButton() {
-		flagButton.imageView?.contentMode = .scaleAspectFit
 		flagButton.accessibilityLabel = "flagButton"
 		flagButton.addTarget(self, action: #selector(displayCountries), for: .touchUpInside)
 		flagButton.translatesAutoresizingMaskIntoConstraints = false
-		flagButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
 	}
 
 	private func setupPhoneCodeTextField() {
@@ -142,40 +140,45 @@ open class FPNTextField: UITextField {
 	}
 
 	private func setupLeftView() {
-		leftView = UIView()
+
+        leftContainerView.addSubview(flagButton)
+        leftContainerView.addSubview(phoneCodeTextField)
+
+		leftView = leftContainerView
 		leftViewMode = .always
-		if #available(iOS 9.0, *) {
+
+        if #available(iOS 9.0, *) {
 			phoneCodeTextField.semanticContentAttribute = .forceLeftToRight
 		} else {
 			// Fallback on earlier versions
 		}
 
-		leftView?.addSubview(flagButton)
-		leftView?.addSubview(phoneCodeTextField)
+        flagWidthConstraint = NSLayoutConstraint(item: flagButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0, constant: flagButtonSize.width)
+        flagHeightConstraint = NSLayoutConstraint(item: flagButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0, constant: flagButtonSize.height)
 
-		flagWidthConstraint = NSLayoutConstraint(item: flagButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0, constant: flagButtonSize.width)
-		flagHeightConstraint = NSLayoutConstraint(item: flagButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0, constant: flagButtonSize.height)
+        flagWidthConstraint?.isActive = true
+        flagHeightConstraint?.isActive = true
 
-		flagWidthConstraint?.isActive = true
-		flagHeightConstraint?.isActive = true
+        //center
+        NSLayoutConstraint(item: flagButton, attribute: .centerY, relatedBy: .equal, toItem: leftContainerView, attribute: .centerY, multiplier: 1, constant: 0).isActive = true
+        NSLayoutConstraint(item: phoneCodeTextField, attribute: .centerY, relatedBy: .equal, toItem: leftContainerView, attribute: .centerY, multiplier: 1, constant: 0).isActive = true
 
-		NSLayoutConstraint(item: flagButton, attribute: .centerY, relatedBy: .equal, toItem: leftView, attribute: .centerY, multiplier: 1, constant: 0).isActive = true
+        //leading trailing
+        NSLayoutConstraint(item: flagButton, attribute: .leading, relatedBy: .equal, toItem: leftContainerView, attribute: .leading, multiplier: 1, constant: 0).isActive = true
+        NSLayoutConstraint(item: phoneCodeTextField, attribute: .trailing, relatedBy: .equal, toItem: leftContainerView, attribute: .trailing, multiplier: 1, constant: 0).isActive = true
 
-		NSLayoutConstraint(item: flagButton, attribute: .leading, relatedBy: .equal, toItem: leftView, attribute: .leading, multiplier: 1, constant: 0).isActive = true
-		NSLayoutConstraint(item: phoneCodeTextField, attribute: .leading, relatedBy: .equal, toItem: flagButton, attribute: .trailing, multiplier: 1, constant: 0).isActive = true
-		NSLayoutConstraint(item: phoneCodeTextField, attribute: .trailing, relatedBy: .equal, toItem: leftView, attribute: .trailing, multiplier: 1, constant: 0).isActive = true
-		NSLayoutConstraint(item: phoneCodeTextField, attribute: .top, relatedBy: .equal, toItem: leftView, attribute: .top, multiplier: 1, constant: 0).isActive = true
-		NSLayoutConstraint(item: phoneCodeTextField, attribute: .bottom, relatedBy: .equal, toItem: leftView, attribute: .bottom, multiplier: 1, constant: 0).isActive = true
-	}
+        //difference
+        NSLayoutConstraint(item: phoneCodeTextField, attribute: .leading, relatedBy: .equal, toItem: flagButton, attribute: .trailing, multiplier: 1, constant: 0).isActive = true
+    }
 
-	open override func updateConstraints() {
-		super.updateConstraints()
+    open override func updateConstraints() {
+        super.updateConstraints()
 
-		flagWidthConstraint?.constant = flagButtonSize.width
-		flagHeightConstraint?.constant = flagButtonSize.height
-	}
+        flagWidthConstraint?.constant = flagButtonSize.width
+        flagHeightConstraint?.constant = flagButtonSize.height
+    }
 
-	open override func leftViewRect(forBounds bounds: CGRect) -> CGRect {
+    open override func leftViewRect(forBounds bounds: CGRect) -> CGRect {
 		let size = leftViewSize
 		let width: CGFloat = min(bounds.size.width, size.width)
 		let height: CGFloat = min(bounds.size.height, size.height)

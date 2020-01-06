@@ -1,7 +1,7 @@
 PODS:
-  - FlagPhoneNumber (0.8.0):
-    - FlagPhoneNumber/libPhoneNumberiOS (= 0.8.0)
-  - FlagPhoneNumber/libPhoneNumberiOS (0.8.0)
+  - FlagPhoneNumber (0.8.2):
+    - FlagPhoneNumber/libPhoneNumberiOS (= 0.8.2)
+  - FlagPhoneNumber/libPhoneNumberiOS (0.8.2)
 
 DEPENDENCIES:
   - FlagPhoneNumber (from `../`)
@@ -11,8 +11,8 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  FlagPhoneNumber: 3712455b95f66cb0f2016fef7d9e34cddf8c7f9a
+  FlagPhoneNumber: 64a129e5c27c0f7989562394740f8f2744a24766
 
 PODFILE CHECKSUM: af6e5d2788506eafefe46d7eddeb65bbfd0082b6
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.8.3
