@@ -23,10 +23,8 @@ class TableViewController: UITableViewController {
 		title = "In Table View"
 		tableView.delaysContentTouches = false
 
-		firstPhoneNumberTextField.displayMode = .picker
 		firstPhoneNumberTextField.delegate = self
 
-		secondPhoneNumberTextField.displayMode = .list
 		secondPhoneNumberTextField.delegate = self
 
 		listController.setup(repository: secondPhoneNumberTextField.countryRepository)

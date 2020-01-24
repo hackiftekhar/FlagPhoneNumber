@@ -19,7 +19,6 @@ class StackViewController: UIViewController {
 		title = "In Stack View"
 		view.backgroundColor = UIColor.groupTableViewBackground
 
-		phoneNumberTextField.displayMode = .picker
 		phoneNumberTextField.delegate = self
 	}
 

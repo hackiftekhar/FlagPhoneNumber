@@ -8,12 +8,11 @@
 
 import UIKit
 import FlagPhoneNumber
+import ContactsUI
 
 class SimpleViewController: UIViewController {
 
 	@IBOutlet weak var phoneNumberTextField: FPNTextField!
-
-	var listController: FPNCountryListViewController = FPNCountryListViewController(style: .grouped)
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -27,13 +26,14 @@ class SimpleViewController: UIViewController {
 
 		phoneNumberTextField.borderStyle = .roundedRect
 //		phoneNumberTextField.pickerView.showPhoneNumbers = false
-		phoneNumberTextField.displayMode = .list // .picker by default
 
-		listController.setup(repository: phoneNumberTextField.countryRepository)
+        phoneNumberTextField.parentViewController =  self
+        phoneNumberTextField.delegate = self
+        phoneNumberTextField.hasPhoneNumberExample = true
 
-		listController.didSelect = { [weak self] country in
-			self?.phoneNumberTextField.setFlag(countryCode: country.code)
-		}
+        if let regionCode = Locale.current.regionCode, let countryCode = FPNCountryCode(rawValue: regionCode) {
+            phoneNumberTextField.setFlag(countryCode: countryCode)
+        }
 
 		phoneNumberTextField.delegate = self
 		phoneNumberTextField.font = UIFont.systemFont(ofSize: 14)
@@ -65,10 +65,6 @@ class SimpleViewController: UIViewController {
 
 		// Set the phone number directly
 		phoneNumberTextField.set(phoneNumber: "+33612345678")
-
-		view.addSubview(phoneNumberTextField)
-
-		phoneNumberTextField.center = view.center
 	}
 
 	private func getCustomTextFieldInputAccessoryView(with items: [UIBarButtonItem]) -> UIToolbar {
@@ -79,10 +75,6 @@ class SimpleViewController: UIViewController {
 		toolbar.sizeToFit()
 
 		return toolbar
-	}
-
-	@objc func dismissCountries() {
-		listController.dismiss(animated: true, completion: nil)
 	}
 }
 
@@ -108,11 +100,5 @@ extension SimpleViewController: FPNTextFieldDelegate {
 
 
 	func fpnDisplayCountryList() {
-		let navigationViewController = UINavigationController(rootViewController: listController)
-
-		listController.title = "Countries"
-		listController.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .stop, target: self, action: #selector(dismissCountries))
-
-		self.present(navigationViewController, animated: true, completion: nil)
 	}
 }

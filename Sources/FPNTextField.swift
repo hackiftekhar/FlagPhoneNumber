@@ -263,16 +263,38 @@ open class FPNTextField: UITextField {
 
 	/// Set directly the phone number. e.g "+33612345678"
 	@objc open func set(phoneNumber: String) {
-		let cleanedPhoneNumber: String = clean(string: phoneNumber)
 
-		if let validPhoneNumber = getValidNumber(phoneNumber: cleanedPhoneNumber) {
+		var cleanedPhoneNumber: String = clean(string: phoneNumber)
+
+        //1st try to get valid number
+        var validPhoneNumber = getValidNumber(phoneNumber: cleanedPhoneNumber)
+
+        //If didn't get then adding selected country prefix and retring again
+        if validPhoneNumber == nil, cleanedPhoneNumber.hasPrefix("+") == false, let dialCode = selectedCountry?.phoneCode {
+            cleanedPhoneNumber = clean(string: "\(dialCode) \(phoneNumber)")
+            validPhoneNumber = getValidNumber(phoneNumber: cleanedPhoneNumber)
+        }
+
+        nbPhoneNumber = validPhoneNumber
+
+		if let validPhoneNumber = validPhoneNumber {
+
 			if validPhoneNumber.italianLeadingZero {
 				text = "0\(validPhoneNumber.nationalNumber.stringValue)"
 			} else {
 				text = validPhoneNumber.nationalNumber.stringValue
 			}
 			setFlag(countryCode: FPNCountryCode(rawValue: phoneUtil.getRegionCode(for: validPhoneNumber))!)
-		}
+        } else if let dialCode = selectedCountry?.phoneCode {
+
+            let codePhoneNumber = clean(string: "\(dialCode) \(phoneNumber)")
+            
+            if let inputString = formatter?.inputString(codePhoneNumber) {
+                text = remove(dialCode: dialCode, in: inputString)
+            }
+        } else {
+            text = cleanedPhoneNumber
+        }
 	}
 
 	/// Set the country image according to country code. Example "FR"
@@ -358,12 +380,11 @@ open class FPNTextField: UITextField {
 			} else {
 				nbPhoneNumber = nil
 
-				if let dialCode = selectedCountry?.phoneCode {
-					if let inputString = formatter?.inputString(cleanedPhoneNumber) {
-						text = remove(dialCode: dialCode, in: inputString)
-					}
-				}
-				(delegate as? FPNTextFieldDelegate)?.fpnDidValidatePhoneNumber(textField: self, isValid: false)
+                if let inputString = formatter?.inputString(cleanedPhoneNumber) {
+                    text = remove(dialCode: phoneCode, in: inputString)
+                }
+
+                (delegate as? FPNTextFieldDelegate)?.fpnDidValidatePhoneNumber(textField: self, isValid: false)
 			}
 		}
 	}

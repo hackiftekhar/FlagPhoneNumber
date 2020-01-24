@@ -22,7 +22,6 @@ class ScrollViewController: UIViewController {
 		contentView.backgroundColor = UIColor.groupTableViewBackground
 		scrollView.delaysContentTouches = false
 
-		phoneNumberTextField.displayMode = .picker
 		phoneNumberTextField.delegate = self
 	}
 }
